@@ -1,0 +1,99 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical">
+
+    <include layout="@layout/layout_fragment_title" />
+
+    <ImageView
+        android:id="@+id/iv_image_mime_detail"
+        android:layout_width="112dp"
+        android:layout_height="112dp"
+        android:layout_gravity="center_horizontal"
+        android:layout_marginTop="16dp"
+        android:src="@drawable/ic_launcher_background" />
+
+
+    <TextView
+        android:id="@+id/tv_name_mime_detail"
+        style="@style/TextView_Style"
+        android:layout_width="wrap_content"
+        android:layout_marginStart="24dp"
+        android:layout_marginTop="16dp"
+        android:gravity="center_vertical"
+        android:text="用户姓名:" />
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:background="@color/gray" />
+
+    <TextView
+        android:id="@+id/tv_number_mime_detail"
+        style="@style/TextView_Style"
+        android:layout_width="wrap_content"
+        android:layout_marginStart="24dp"
+        android:gravity="center_vertical"
+        android:paddingTop="8dp"
+        android:paddingBottom="8dp"
+        android:text="联系方式:" />
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:background="@color/gray" />
+
+    <TextView
+        android:id="@+id/tv_city_mime_detail"
+        style="@style/TextView_Style"
+        android:layout_width="wrap_content"
+        android:layout_marginStart="24dp"
+        android:gravity="center_vertical"
+        android:paddingTop="8dp"
+        android:paddingBottom="8dp"
+        android:text="用户城市:" />
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:background="@color/gray" />
+
+    <TextView
+        style="@style/TextView_Style"
+        android:id="@+id/tv_adress_mime_detail"
+        android:layout_width="wrap_content"
+        android:layout_marginStart="24dp"
+        android:gravity="center_vertical"
+        android:paddingTop="8dp"
+        android:paddingBottom="8dp"
+        android:text="用户地址:" />
+
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="24dp"
+        android:layout_marginTop="24dp"
+        android:layout_marginEnd="24dp">
+
+        <Button
+            android:id="@+id/btn_modify_info_mime_detail"
+            style="@style/Button_Style"
+            android:layout_width="0dp"
+            android:layout_marginEnd="8dp"
+            android:layout_weight="1"
+            android:text="修改资料" />
+
+        <Button
+            android:id="@+id/btn_modify_password_mime_detail"
+            style="@style/Button_Style"
+            android:layout_width="0dp"
+            android:layout_marginStart="8dp"
+            android:layout_weight="1"
+            android:text="修改密码" />
+
+    </LinearLayout>
+
+
+</LinearLayout>

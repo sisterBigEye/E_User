@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <declare-styleable name="CircularProgressView">
+        <attr name="text" format="string" />
+        <attr name="descText" format="string" />
+        <attr name="textSize" format="dimension" />
+        <attr name="textColor" format="color" />
+        <attr name="color" format="color" />
+    </declare-styleable>
+
+    <declare-styleable name="CrossView">
+        <attr name="layout_width" format="dimension" />
+        <attr name="layout_height" format="dimension" />
+        <attr name="firstLineColor" format="color" />
+        <attr name="secondLineColor" format="color" />
+        <attr name="firstCrossColor" format="color" />
+        <attr name="secondCrossColor" format="color" />
+    </declare-styleable>
+
+</resources>

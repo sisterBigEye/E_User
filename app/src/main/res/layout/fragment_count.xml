@@ -1,0 +1,215 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+
+        <include layout="@layout/layout_fragment_title" />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="64dp"
+            android:background="@color/colorPrimary"
+            android:orientation="horizontal"
+            android:padding="8dp">
+
+            <LinearLayout
+                android:id="@+id/ll_power_day_count"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:gravity="center"
+                android:orientation="vertical">
+
+                <TextView
+                    android:id="@+id/tv_power_day_count"
+                    style="@style/IndicatorTitleText"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="8dp"
+                    android:elevation="4dp"
+                    android:gravity="center_horizontal"
+                    android:text="分时电量(日)" />
+
+                <View
+                    android:id="@+id/v_power_day_count"
+                    android:layout_width="96dp"
+                    android:layout_height="4dp"
+                    android:background="@color/white" />
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/ll_power_mon_count"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:gravity="center"
+                android:orientation="vertical">
+
+                <TextView
+                    android:id="@+id/tv_power_mon_count"
+                    style="@style/IndicatorTitleText"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="8dp"
+                    android:elevation="4dp"
+                    android:text="分时电量(月)" />
+
+                <View
+                    android:id="@+id/v_power_mon_count"
+                    android:layout_width="96dp"
+                    android:layout_height="4dp"
+                    android:background="@color/white"
+                    android:visibility="invisible" />
+
+            </LinearLayout>
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="48dp"
+            android:orientation="horizontal"
+            android:paddingStart="8dp"
+            android:paddingEnd="8dp">
+
+            <ImageView
+                android:id="@+id/iv_power_left_time_count"
+                android:layout_width="36dp"
+                android:layout_height="match_parent"
+                android:layout_gravity="center"
+                android:src="@drawable/ic_left" />
+
+            <TextView
+                android:id="@+id/tv_power_time_count"
+                style="@style/Small_Title_Text_Style"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:gravity="center" />
+
+            <ImageView
+                android:id="@+id/iv_power_right_time_count"
+                android:layout_width="36dp"
+                android:layout_height="match_parent"
+                android:layout_gravity="center"
+                android:src="@drawable/ic_right" />
+
+        </LinearLayout>
+
+        <com.hlbd.electric.widget.HistogramView
+            android:id="@+id/hv_power_count"
+            android:layout_width="match_parent"
+            android:layout_height="240dp"
+            android:layout_margin="24dp" />
+
+        <LinearLayout
+            android:visibility="gone"
+            android:layout_width="match_parent"
+            android:layout_height="64dp"
+            android:background="@color/colorPrimary"
+            android:orientation="horizontal"
+            android:padding="8dp">
+
+            <LinearLayout
+                android:id="@+id/ll_cost_day_count"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:gravity="center"
+                android:orientation="vertical">
+
+                <TextView
+                    android:id="@+id/tv_cost_day_count"
+                    style="@style/IndicatorTitleText"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="8dp"
+                    android:elevation="4dp"
+                    android:gravity="center_horizontal"
+                    android:text="分时(日)" />
+
+                <View
+                    android:id="@+id/v_cost_day_count"
+                    android:layout_width="96dp"
+                    android:layout_height="4dp"
+                    android:background="@color/white" />
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/ll_cost_mon_count"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:gravity="center"
+                android:orientation="vertical">
+
+                <TextView
+                    android:id="@+id/tv_cost_mon_count"
+                    style="@style/IndicatorTitleText"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="8dp"
+                    android:elevation="4dp"
+                    android:text="分时(月)" />
+
+                <View
+                    android:id="@+id/v_cost_mon_count"
+                    android:layout_width="96dp"
+                    android:layout_height="4dp"
+                    android:background="@color/white"
+                    android:visibility="invisible" />
+
+            </LinearLayout>
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:visibility="gone"
+            android:layout_width="match_parent"
+            android:layout_height="48dp"
+            android:orientation="horizontal"
+            android:paddingStart="8dp"
+            android:paddingEnd="8dp">
+
+            <ImageView
+                android:id="@+id/iv_cost_left_time_count"
+                android:layout_width="36dp"
+                android:layout_height="match_parent"
+                android:layout_gravity="center"
+                android:src="@drawable/ic_left" />
+
+            <TextView
+                android:id="@+id/tv_cost_time_count"
+                style="@style/Small_Title_Text_Style"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:gravity="center" />
+
+            <ImageView
+                android:id="@+id/iv_cost_right_time_count"
+                android:layout_width="36dp"
+                android:layout_height="match_parent"
+                android:layout_gravity="center"
+                android:src="@drawable/ic_right" />
+
+        </LinearLayout>
+
+        <com.hlbd.electric.widget.HistogramView
+            android:visibility="gone"
+            android:id="@+id/hv_cost_count"
+            android:layout_width="match_parent"
+            android:layout_height="240dp"
+            android:layout_margin="24dp" />
+
+    </LinearLayout>
+
+
+</ScrollView>

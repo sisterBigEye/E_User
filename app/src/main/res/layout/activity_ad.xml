@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/ll_ad"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:gravity="center"
+    android:orientation="vertical">
+
+    <LinearLayout
+        android:orientation="vertical"
+        android:layout_width="300dp"
+        android:layout_height="match_parent"
+        android:background="@drawable/shape_dialog"
+        android:gravity="bottom|center">
+
+        <TextView
+            android:textSize="16sp"
+            android:textColor="@color/white"
+            android:background="@color/login_btn_color"
+            android:layout_width="match_parent"
+            android:gravity="center"
+            android:layout_height="100dp"
+            android:text="点击保存二维码" />
+
+        <ImageView
+            android:layout_margin="8dp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@drawable/ic_qr_code" />
+
+        <Button
+            android:layout_marginTop="16dp"
+            android:textSize="16sp"
+            android:id="@+id/btn_save_ad"
+            android:textColor="@color/white"
+            android:background="@drawable/shape_login_btn"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="16dp"
+            android:text="保存" />
+
+    </LinearLayout>
+
+    <View
+        android:layout_width="2dp"
+        android:layout_height="36dp"
+        android:background="@color/white" />
+
+    <ImageView
+        android:id="@+id/iv_cencel_ad"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:src="@drawable/ic_cancel" />
+
+
+</LinearLayout>

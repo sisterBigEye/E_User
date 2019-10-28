@@ -1,0 +1,37 @@
+<resources>
+    <string name="app_name">能源管家</string>
+    <string name="user_name">用户名</string>
+    <string name="login_icon">登录图片</string>
+    <string name="login">登录</string>
+    <string name="password">密码</string>
+    <string name="stress">应力在线检测</string>
+    <string name="voice">声发射在线监测</string>
+    <string name="hinge">支铰轴承在线检测</string>
+    <string name="inclination">倾角在线检测</string>
+    <string name="dynamic">动态响应在线检测</string>
+    <string name="alarm">报警</string>
+    <string name="stress_alarm">应力报警信息:</string>
+    <string name="dynamic_alarm">动态报警信息:</string>
+    <string name="inclination_alarm">倾角报警信息:</string>
+    <string name="hinge_alarm">支铰铀报警信息:</string>
+    <string name="voice_alarm">声发射在线监测:</string>
+    <string name="url">服务器</string>
+
+    <!--Launcher-->
+    <string name="data">数据</string>
+    <string name="event">事件</string>
+    <string name="work_order">工单</string>
+    <string name="report">报告</string>
+    <string name="mime">我的</string>
+    <!--Launcher-->
+
+    <!--RealtimeDataFragment-->
+    <string name="electric_power">电力</string>
+    <string name="environment">环境</string>
+    <string name="busbar">母排</string>
+    <string name="flood">水浸</string>
+    <string name="video">视频</string>
+    <!--RealtimeDataFragment-->
+
+
+</resources>

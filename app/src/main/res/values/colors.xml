@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="colorPrimary">#4CAF50</color>
+    <color name="colorPrimaryDark">#384ab8</color>
+    <color name="colorAccent">#4c60d0</color>
+
+    <color name="gray">#dbdbdb</color>
+    <color name="white">#ffffff</color>
+    <color name="yellow">#f7cf3e</color>
+    <color name="green">#98FFA5</color>
+    <color name="black">#000000</color>
+    <color name="red">#F18585</color>
+    <color name="orange">#ffa24a</color>
+
+    <color name="yellow_plus">#c7a731</color>
+    <color name="green_plus">#4CAF50</color>
+    <color name="orange_plus">#ff7e38</color>
+    <color name="gray_plus">#7e7e7e</color>
+    <color name="gray_low">#f1f1f1</color>
+
+    <color name="gold">#f7eb00</color>
+    <color name="login_btn_color">#4CAF50</color>
+    <color name="item_color">#6db2d6</color>
+    <color name="main_item">#6db2d6</color>
+    <color name="main_item_select">#5493b4</color>
+
+    <color name="color_translucent">#64c3c3c3</color>
+    <color name="color_transparent">#00000000</color>
+
+    <color name="color_login">#cafeff</color>
+
+    <color name="launcher_btn">#000000</color>
+    <color name="launcher_btn_select">#605B5B</color>
+
+    <color name="data_btn">#FFFFFF</color>
+    <color name="data_btn_select">#DAD5D5</color>
+
+    <color name="data_icon">#FFFFFF</color>
+    <color name="data_icon_select">#4CAF50</color>
+
+    <color name="purple">#9932CD</color>
+    <color name="purple_plus">#704294</color>
+
+    <color name="ele_green">#8072B673</color>
+
+    <color name="test">#80E57A3E</color>
+
+    <color name="gray_plus1">#AAA8A8</color>
+
+    <color name="TEST">#FFE57A3E</color>
+
+    <color name="gray_transparent">#80C9C6C6</color>
+
+
+</resources>
