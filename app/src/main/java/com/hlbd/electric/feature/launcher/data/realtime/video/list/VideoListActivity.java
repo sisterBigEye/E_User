@@ -29,6 +29,9 @@ public class VideoListActivity extends AppCompatActivity implements View.OnClick
   private EditText mSearchEt;
   private ImageView mSearchIv;
 
+  public static final String EXTRA_KEY_URL = "videoUrl";
+  public static final String EXTRA_KEY_CAMERA_TYPE = "camera_type";
+
   private static final String TAG = "VideoListActivity";
 
   @Override
@@ -64,7 +67,8 @@ public class VideoListActivity extends AppCompatActivity implements View.OnClick
           return;
         }
         Intent i = new Intent();
-        i.putExtra("value", row.videourl);
+        i.putExtra(EXTRA_KEY_URL, row.videourl);
+        i.putExtra(EXTRA_KEY_CAMERA_TYPE, row.cameratype);
         setResult(RESULT_CODE, i);
         finish();
       }

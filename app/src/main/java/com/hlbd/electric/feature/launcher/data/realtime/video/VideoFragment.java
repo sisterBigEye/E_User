@@ -24,7 +24,7 @@ import com.hlbd.electric.util.ToastUtil;
 import java.io.IOException;
 import java.lang.ref.WeakReference;
 
-public class VideoFragment extends BaseFragment {
+public class VideoFragment extends BaseFragment implements View.OnClickListener {
 
   private static final String TAG = "VideoFragment";
 
@@ -33,6 +33,9 @@ public class VideoFragment extends BaseFragment {
   private SurfaceView mVideoView;
   private MediaPlayer mPlayer;
   private SurfaceHolder mHolder;
+  private View mControlV;
+  private String mRawUrl;
+  private String mCurrentCameraType;
 
   @Nullable
   @Override
@@ -51,6 +54,11 @@ public class VideoFragment extends BaseFragment {
 
   private void initView() {
     mVideoView = mParentView.findViewById(R.id.sv_video);
+    mControlV = mParentView.findViewById(R.id.ll_control_video);
+
+    mParentView.findViewById(R.id.btn_live_video).setOnClickListener(this);
+    mParentView.findViewById(R.id.btn_playback_video).setOnClickListener(this);
+
     SurfaceHolder holder = mVideoView.getHolder();
     holder.addCallback(mCallback);
   }
@@ -108,6 +116,23 @@ public class VideoFragment extends BaseFragment {
     startActivityForResult(new Intent(getActivity(), VideoListActivity.class), VideoListActivity.REQUEST_CODE);
   }
 
+  @Override
+  public void onClick(View v) {
+    switch (v.getId()) {
+      case R.id.btn_live_video:
+        if (mCurrentCameraType != null && mCurrentCameraType.equals("球机")) {
+          mControlV.setVisibility(View.VISIBLE);
+        }
+        break;
+      case R.id.btn_playback_video:
+        mControlV.setVisibility(View.INVISIBLE);
+        break;
+      default:
+        break;
+    }
+
+  }
+
   private static class EventHandler extends Handler {
 
     private final WeakReference<VideoFragment> mRef;
@@ -149,7 +174,15 @@ public class VideoFragment extends BaseFragment {
   public void onActivityResult(int requestCode, int resultCode, Intent data) {
     super.onActivityResult(requestCode, resultCode, data);
     if (requestCode == VideoListActivity.REQUEST_CODE && resultCode == VideoListActivity.RESULT_CODE) {
-      String url = data.getStringExtra("value");
+      String url = data.getStringExtra(VideoListActivity.EXTRA_KEY_URL);
+      mRawUrl = url;
+      String cameraType = data.getStringExtra(VideoListActivity.EXTRA_KEY_CAMERA_TYPE);
+      mCurrentCameraType = cameraType;
+      if (cameraType == null || !cameraType.equals("球机")) {
+        mControlV.setVisibility(View.INVISIBLE);
+      } else {
+        mControlV.setVisibility(View.VISIBLE);
+      }
       if (url == null || TextUtils.isEmpty(url)) {
         return;
       }

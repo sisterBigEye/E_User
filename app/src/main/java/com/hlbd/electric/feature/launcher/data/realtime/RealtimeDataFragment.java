@@ -60,6 +60,8 @@ public class RealtimeDataFragment extends BaseFragment implements RealtimeDataCo
   private ArrayList<Integer> mDefaultBackGroundIdList;
   private int mIndex;
 
+  private View mOtherV;
+
   @Nullable
   @Override
   public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
@@ -77,6 +79,7 @@ public class RealtimeDataFragment extends BaseFragment implements RealtimeDataCo
   }
 
   private void init() {
+    mOtherV = mBaseView.findViewById(R.id.ll_other_data);
     mFragments = new ArrayList<>();
 
     mElecFragment = new ElecFragment();
@@ -303,6 +306,11 @@ public class RealtimeDataFragment extends BaseFragment implements RealtimeDataCo
   }
 
   private void notifyDataAndState(int index, BaseFragment fragment) {
+    if (index == INDEX_VIDEO) {
+      mOtherV.setVisibility(View.GONE);
+    } else {
+      mOtherV.setVisibility(View.VISIBLE);
+    }
     mCurrentFragment.stopTask();
     fragment.startTask();
     FragmentTransaction transaction = mManager.beginTransaction();

@@ -37,15 +37,18 @@ public class VideoInfo {
   }
 
   public static class Row {
-    public String videourl;
-
+    public String cameratype;
     public String specificname;
+    public String username;
+    public String videourl;
 
     @Override
     public String toString() {
       return "Row{" +
-              "videourl='" + videourl + '\'' +
+              "cameratype='" + cameratype + '\'' +
               ", specificname='" + specificname + '\'' +
+              ", username='" + username + '\'' +
+              ", videourl='" + videourl + '\'' +
               '}';
     }
   }

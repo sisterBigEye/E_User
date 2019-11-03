@@ -7,18 +7,18 @@
     <include layout="@layout/layout_fragment_title" />
 
     <LinearLayout
-        android:layout_marginTop="16dp"
         android:id="@+id/ll_fgt_detail_data"
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_margin="8dp"
-        android:layout_weight="2"
+        android:layout_marginTop="16dp"
+        android:layout_weight="1"
         android:orientation="vertical" />
 
     <LinearLayout
-        android:layout_marginBottom="16dp"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_marginBottom="16dp"
         android:background="@color/data_icon"
         android:gravity="center_vertical"
         android:orientation="horizontal"
@@ -181,20 +181,29 @@
 
     </LinearLayout>
 
-    <Button
-        android:id="@+id/btn_analysus_detail_data"
-        style="@style/Button_Style"
-        android:layout_width="match_parent"
-        android:layout_marginStart="24dp"
-        android:layout_marginEnd="24dp"
-        android:text="数据统计分析" />
-
-    <ImageView
-        android:id="@+id/iv_data_detail_data"
+    <LinearLayout
+        android:id="@+id/ll_other_data"
+        android:orientation="vertical"
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:layout_marginTop="16dp"
-        android:layout_marginBottom="16dp"
-        android:layout_weight="1" />
+        android:layout_weight="1">
+
+        <Button
+            android:id="@+id/btn_analysus_detail_data"
+            style="@style/Button_Style"
+            android:layout_width="match_parent"
+            android:layout_marginStart="24dp"
+            android:layout_marginEnd="24dp"
+            android:text="数据统计分析" />
+
+        <ImageView
+            android:id="@+id/iv_data_detail_data"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_marginTop="16dp"
+            android:layout_marginBottom="16dp"
+            android:layout_weight="1" />
+
+    </LinearLayout>
 
 </LinearLayout>
