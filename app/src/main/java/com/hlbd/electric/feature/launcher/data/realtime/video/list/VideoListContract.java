@@ -4,7 +4,7 @@ package com.hlbd.electric.feature.launcher.data.realtime.video.list;
 import com.hlbd.electric.base.BasePresenter;
 import com.hlbd.electric.base.BaseView;
 
-class VideoContract {
+class VideoListContract {
 
     interface Presenter extends BasePresenter {
 

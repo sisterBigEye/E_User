@@ -19,11 +19,11 @@ import com.hlbd.electric.util.ToastUtil;
 
 import java.util.List;
 
-public class VideoListActivity extends AppCompatActivity implements View.OnClickListener, VideoContract.View<VideoInfo> {
+public class VideoListActivity extends AppCompatActivity implements View.OnClickListener, VideoListContract.View<VideoListInfo> {
 
   private VideoListAdapter mAdapter;
-  private VideoRequest mRequest;
-  private VideoContract.Presenter mPresenter;
+  private VideoListRequest mRequest;
+  private VideoListContract.Presenter mPresenter;
   public static final int REQUEST_CODE = 1;
   public static final int RESULT_CODE = 100;
   private EditText mSearchEt;
@@ -31,6 +31,7 @@ public class VideoListActivity extends AppCompatActivity implements View.OnClick
 
   public static final String EXTRA_KEY_URL = "videoUrl";
   public static final String EXTRA_KEY_CAMERA_TYPE = "camera_type";
+  public static final String EXTRA_KEY_CAMERA_SPECIFIC = "specificName";
 
   private static final String TAG = "VideoListActivity";
 
@@ -43,10 +44,10 @@ public class VideoListActivity extends AppCompatActivity implements View.OnClick
   }
 
   private void init() {
-    mRequest = new VideoRequest(HttpApi.getUserName());
+    mRequest = new VideoListRequest(HttpApi.getUserName());
     mRequest.url = "Baoding_VideoThing/Services/SelectVideoByKeyword?";
     mRequest.keyword = "";
-    mPresenter = new VideoPresenter(this, mRequest);
+    mPresenter = new VideoListPresenter(this, mRequest);
   }
 
   private void initView() {
@@ -61,7 +62,7 @@ public class VideoListActivity extends AppCompatActivity implements View.OnClick
     lv.setOnItemClickListener(new AdapterView.OnItemClickListener() {
       @Override
       public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-        VideoInfo.Row row = mAdapter.mInfoList.get(position);
+        VideoListInfo.Row row = mAdapter.mInfoList.get(position);
         if (row == null || row.videourl == null) {
           finish();
           return;
@@ -69,6 +70,7 @@ public class VideoListActivity extends AppCompatActivity implements View.OnClick
         Intent i = new Intent();
         i.putExtra(EXTRA_KEY_URL, row.videourl);
         i.putExtra(EXTRA_KEY_CAMERA_TYPE, row.cameratype);
+        i.putExtra(EXTRA_KEY_CAMERA_SPECIFIC, row.specificname);
         setResult(RESULT_CODE, i);
         finish();
       }
@@ -86,13 +88,13 @@ public class VideoListActivity extends AppCompatActivity implements View.OnClick
   }
 
   @Override
-  public void notifyVideoInfo(VideoInfo info) {
+  public void notifyVideoInfo(VideoListInfo info) {
     LogUtil.d(TAG, "notifyVideoInfo() info=" + info);
     if (info == null) {
       ToastUtil.toast("获取数据失败");
       return;
     }
-    List<VideoInfo.Row> rows = info.rows;
+    List<VideoListInfo.Row> rows = info.rows;
     if (rows == null || rows.size() == 0) {
       ToastUtil.toast("没有找到相关数据");
       return;
@@ -124,7 +126,7 @@ public class VideoListActivity extends AppCompatActivity implements View.OnClick
   }
 
   @Override
-  public void setPersonal(VideoContract.Presenter p) {
+  public void setPersonal(VideoListContract.Presenter p) {
     mPresenter = p;
   }
 }

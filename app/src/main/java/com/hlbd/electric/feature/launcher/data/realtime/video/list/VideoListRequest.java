@@ -2,13 +2,13 @@ package com.hlbd.electric.feature.launcher.data.realtime.video.list;
 
 import com.hlbd.electric.base.BaseResult;
 
-public class VideoRequest extends BaseResult {
+public class VideoListRequest extends BaseResult {
 
   public String username;
 
   public String keyword;
 
-  public VideoRequest(String username) {
+  public VideoListRequest(String username) {
     this.username = username;
   }
 }

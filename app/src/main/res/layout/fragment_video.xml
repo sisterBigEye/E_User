@@ -5,7 +5,14 @@
     android:gravity="center"
     android:orientation="vertical">
 
+    <WebView
+        android:id="@+id/wv_video"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="5" />
+
     <SurfaceView
+        android:visibility="gone"
         android:id="@+id/sv_video"
         android:layout_width="match_parent"
         android:layout_height="0dp"

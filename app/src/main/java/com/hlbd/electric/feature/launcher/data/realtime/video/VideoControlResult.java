@@ -1,8 +1,8 @@
-package com.hlbd.electric.feature.launcher.data.realtime.video.list;
+package com.hlbd.electric.feature.launcher.data.realtime.video;
 
 import java.util.List;
 
-public class VideoInfo {
+public class VideoControlResult {
 
   public DataShape dataShape;
 
@@ -37,25 +37,21 @@ public class VideoInfo {
   }
 
   public static class Row {
-    public String cameratype;
-    public String specificname;
-    public String username;
-    public String videourl;
+    public String channelNo;
+    public String deviceSerial;
 
     @Override
     public String toString() {
       return "Row{" +
-              "cameratype='" + cameratype + '\'' +
-              ", specificname='" + specificname + '\'' +
-              ", username='" + username + '\'' +
-              ", videourl='" + videourl + '\'' +
+              "channelNo='" + channelNo + '\'' +
+              ", deviceSerial='" + deviceSerial + '\'' +
               '}';
     }
   }
 
   @Override
   public String toString() {
-    return "VideoInfo{" +
+    return "VideoControlResult{" +
             "dataShape=" + dataShape +
             ", rows=" + rows +
             '}';

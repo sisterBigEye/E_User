@@ -14,6 +14,7 @@ import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 import android.view.View;
 import android.view.ViewGroup;
+import android.webkit.WebView;
 
 import com.hlbd.electric.R;
 import com.hlbd.electric.base.BaseFragment;
@@ -24,18 +25,24 @@ import com.hlbd.electric.util.ToastUtil;
 import java.io.IOException;
 import java.lang.ref.WeakReference;
 
-public class VideoFragment extends BaseFragment implements View.OnClickListener {
+public class VideoFragment extends BaseFragment implements View.OnClickListener, VideoContract.View {
 
   private static final String TAG = "VideoFragment";
 
   private View mParentView;
   private EventHandler mHandler;
   private SurfaceView mVideoView;
+  private WebView mVideoWv;
   private MediaPlayer mPlayer;
   private SurfaceHolder mHolder;
   private View mControlV;
   private String mRawUrl;
   private String mCurrentCameraType;
+  private String lastUrl = "";
+
+  private VideoPresenter mPresenter;
+  private VideoControlRequest mControlRequest;
+  private VideoChannelRequest mChannelRequest;
 
   @Nullable
   @Override
@@ -49,18 +56,33 @@ public class VideoFragment extends BaseFragment implements View.OnClickListener 
   }
 
   private void init() {
+    mControlRequest = new VideoControlRequest();
+    mControlRequest.speed = 0;
+    mControlRequest.url = "Baoding_VideoThing/Services/CameraControll?";
 
+    mChannelRequest = new VideoChannelRequest();
+    mChannelRequest.url = "Baoding_VideoThing/Services/SelectVideoDserialAndChannelNoByspecificname?";
+    mPresenter = new VideoPresenter(this, mControlRequest, mChannelRequest);
   }
 
   private void initView() {
-    mVideoView = mParentView.findViewById(R.id.sv_video);
+    //mVideoView = mParentView.findViewById(R.id.sv_video);
     mControlV = mParentView.findViewById(R.id.ll_control_video);
+    mVideoWv = mParentView.findViewById(R.id.wv_video);
 
     mParentView.findViewById(R.id.btn_live_video).setOnClickListener(this);
     mParentView.findViewById(R.id.btn_playback_video).setOnClickListener(this);
 
-    SurfaceHolder holder = mVideoView.getHolder();
-    holder.addCallback(mCallback);
+    mParentView.findViewById(R.id.iv_up_video).setOnClickListener(this);
+    mParentView.findViewById(R.id.iv_down_video).setOnClickListener(this);
+    mParentView.findViewById(R.id.iv_left_video).setOnClickListener(this);
+    mParentView.findViewById(R.id.iv_right_video).setOnClickListener(this);
+
+    mParentView.findViewById(R.id.btn_enlarge_video).setOnClickListener(this);
+    mParentView.findViewById(R.id.btn_narrow_video).setOnClickListener(this);
+
+    /*SurfaceHolder holder = mVideoView.getHolder();
+    holder.addCallback(mCallback);*/
   }
 
   public void play(String url) {
@@ -88,6 +110,30 @@ public class VideoFragment extends BaseFragment implements View.OnClickListener 
       LogUtil.e(TAG, "notifyVideoInfo() play error", e);
       ToastUtil.toast("播放失败");
     }
+  }
+
+  public void playWebView(String url) {
+    LogUtil.d(TAG, "playWebView() url=" + url);
+    if (url == null || TextUtils.isEmpty(url)) {
+      return;
+    }
+
+    mVideoWv.reload();
+
+    mVideoWv.getSettings().setJavaScriptEnabled(true);
+
+    //mVideoWv.getSettings().setPluginsEnabled(true);
+
+    //mVideoWv.getSettings().setPluginState(WebSettings.PluginState.ON);
+
+    mVideoWv.setVisibility(View.VISIBLE);
+
+    mVideoWv.getSettings().setUseWideViewPort(true);
+
+    mVideoWv.loadUrl(url);
+
+    lastUrl = url;
+
   }
 
 
@@ -118,18 +164,89 @@ public class VideoFragment extends BaseFragment implements View.OnClickListener 
 
   @Override
   public void onClick(View v) {
+    boolean isControl = false;
     switch (v.getId()) {
       case R.id.btn_live_video:
+        ToastUtil.toast("直播");
         if (mCurrentCameraType != null && mCurrentCameraType.equals("球机")) {
           mControlV.setVisibility(View.VISIBLE);
         }
+        playWebView(mRawUrl);
         break;
       case R.id.btn_playback_video:
+        ToastUtil.toast("回放");
         mControlV.setVisibility(View.INVISIBLE);
         break;
+
+      case R.id.iv_up_video:
+        ToastUtil.toast("上");
+        isControl = true;
+        mControlRequest.direction = 0;
+        break;
+
+      case R.id.iv_down_video:
+        ToastUtil.toast("下");
+        isControl = true;
+        mControlRequest.direction = 1;
+        break;
+
+      case R.id.iv_left_video:
+        ToastUtil.toast("左");
+        isControl = true;
+        mControlRequest.direction = 2;
+        break;
+
+      case R.id.iv_right_video:
+        ToastUtil.toast("右");
+        isControl = true;
+        mControlRequest.direction = 3;
+        break;
+
+      case R.id.btn_enlarge_video:
+        ToastUtil.toast("放大");
+        isControl = true;
+        mControlRequest.direction = 8;
+        break;
+
+      case R.id.btn_narrow_video:
+        ToastUtil.toast("缩小");
+        isControl = true;
+        mControlRequest.direction = 9;
+        break;
+
       default:
         break;
     }
+
+    if (isControl) {
+      LogUtil.d(TAG, "onClick() mControlRequest=" + mControlRequest);
+      mPresenter.controlVideo();
+    }
+
+  }
+
+  @Override
+  public void channelResult(VideoChannel channel) {
+    LogUtil.d(TAG, "channelResult() channel=" + channel);
+    if (channel == null) {
+      return;
+    }
+    for (VideoChannel.Row row : channel.rows) {
+      if (row == null) {
+        continue;
+      }
+      mControlRequest.channelNo = row.channelNo;
+      mControlRequest.deviceSerial = row.deviceSerial;
+    }
+  }
+
+  @Override
+  public void controlVideoResult(VideoControlResult result) {
+
+  }
+
+  @Override
+  public void setPersonal(VideoContract.Presenter p) {
 
   }
 
@@ -163,10 +280,14 @@ public class VideoFragment extends BaseFragment implements View.OnClickListener 
   }
 
   public void stop() {
+    LogUtil.d(TAG, "stop()");
     if (mPlayer != null) {
       mPlayer.stop();
       mPlayer.release();
       mPlayer = null;
+    }
+    if (mVideoWv != null) {
+      mVideoWv.stopLoading();
     }
   }
 
@@ -186,7 +307,9 @@ public class VideoFragment extends BaseFragment implements View.OnClickListener 
       if (url == null || TextUtils.isEmpty(url)) {
         return;
       }
-      play(url);
+      mChannelRequest.specificname = data.getStringExtra(VideoListActivity.EXTRA_KEY_CAMERA_SPECIFIC);
+      mPresenter.start();
+      playWebView(url);
     }
 
   }

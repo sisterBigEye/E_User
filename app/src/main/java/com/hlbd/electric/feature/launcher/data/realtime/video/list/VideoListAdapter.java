@@ -14,13 +14,13 @@ import java.util.List;
 
 public class VideoListAdapter extends BaseAdapter {
   private static final String TAG = "VideoListAdapter";
-  public List<VideoInfo.Row> mInfoList;
+  public List<VideoListInfo.Row> mInfoList;
 
   public VideoListAdapter() {
     mInfoList = new ArrayList<>();
   }
 
-  public void addDataList(List<VideoInfo.Row> list) {
+  public void addDataList(List<VideoListInfo.Row> list) {
     mInfoList.clear();
     ;
     if (list == null || list.size() == 0) {
@@ -37,7 +37,7 @@ public class VideoListAdapter extends BaseAdapter {
   }
 
   @Override
-  public VideoInfo.Row getItem(int position) {
+  public VideoListInfo.Row getItem(int position) {
     return mInfoList.get(position);
   }
 
@@ -56,7 +56,7 @@ public class VideoListAdapter extends BaseAdapter {
     } else {
       holder = (Holder) convertView.getTag();
     }
-    VideoInfo.Row info = mInfoList.get(position);
+    VideoListInfo.Row info = mInfoList.get(position);
     LogUtil.d(TAG, "getView() indo=" + info);
     if (info != null) {
       holder.mTitleTv.setText(info.specificname);
