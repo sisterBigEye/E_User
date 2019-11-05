@@ -12,6 +12,8 @@ class VideoContract {
 
         void controlVideo();
 
+        void playbackRequest();
+
     }
 
     interface View extends BaseView<Presenter> {
@@ -19,6 +21,8 @@ class VideoContract {
         void channelResult(VideoChannel channel);
 
         void controlVideoResult(VideoControlResult result);
+
+        void playbackResult(VideoPlaybackResult result);
 
 
     }

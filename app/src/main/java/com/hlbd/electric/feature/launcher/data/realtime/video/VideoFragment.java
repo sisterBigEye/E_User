@@ -1,8 +1,6 @@
 package com.hlbd.electric.feature.launcher.data.realtime.video;
 
 import android.content.Intent;
-import android.media.MediaPlayer;
-import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
@@ -10,8 +8,6 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.text.TextUtils;
 import android.view.LayoutInflater;
-import android.view.SurfaceHolder;
-import android.view.SurfaceView;
 import android.view.View;
 import android.view.ViewGroup;
 import android.webkit.WebView;
@@ -22,7 +18,6 @@ import com.hlbd.electric.feature.launcher.data.realtime.video.list.VideoListActi
 import com.hlbd.electric.util.LogUtil;
 import com.hlbd.electric.util.ToastUtil;
 
-import java.io.IOException;
 import java.lang.ref.WeakReference;
 
 public class VideoFragment extends BaseFragment implements View.OnClickListener, VideoContract.View {
@@ -30,19 +25,17 @@ public class VideoFragment extends BaseFragment implements View.OnClickListener,
   private static final String TAG = "VideoFragment";
 
   private View mParentView;
-  private EventHandler mHandler;
-  private SurfaceView mVideoView;
   private WebView mVideoWv;
-  private MediaPlayer mPlayer;
-  private SurfaceHolder mHolder;
   private View mControlV;
   private String mRawUrl;
+  private String mPlaybackUrl;
   private String mCurrentCameraType;
   private String lastUrl = "";
 
   private VideoPresenter mPresenter;
   private VideoControlRequest mControlRequest;
   private VideoChannelRequest mChannelRequest;
+  private VideoPlaybackRequest mVideoPlaybackRequest;
 
   @Nullable
   @Override
@@ -62,7 +55,10 @@ public class VideoFragment extends BaseFragment implements View.OnClickListener,
 
     mChannelRequest = new VideoChannelRequest();
     mChannelRequest.url = "Baoding_VideoThing/Services/SelectVideoDserialAndChannelNoByspecificname?";
-    mPresenter = new VideoPresenter(this, mControlRequest, mChannelRequest);
+
+    mVideoPlaybackRequest = new VideoPlaybackRequest();
+    mVideoPlaybackRequest.url = "Baoding_VideoThing/Services/VideoPlayBack?";
+    mPresenter = new VideoPresenter(this, mControlRequest, mChannelRequest, mVideoPlaybackRequest);
   }
 
   private void initView() {
@@ -81,35 +77,6 @@ public class VideoFragment extends BaseFragment implements View.OnClickListener,
     mParentView.findViewById(R.id.btn_enlarge_video).setOnClickListener(this);
     mParentView.findViewById(R.id.btn_narrow_video).setOnClickListener(this);
 
-    /*SurfaceHolder holder = mVideoView.getHolder();
-    holder.addCallback(mCallback);*/
-  }
-
-  public void play(String url) {
-    LogUtil.d(TAG, "play() url=" + url);
-    if (url == null || TextUtils.isEmpty(url)) {
-      return;
-    }
-    if (mPlayer != null) {
-      mPlayer.release();
-    }
-    mPlayer = new MediaPlayer();
-    try {
-      mPlayer.setDataSource(getContext(), Uri.parse(url));
-      mPlayer.prepare();
-      mPlayer.setOnPreparedListener(new MediaPlayer.OnPreparedListener() {
-        @Override
-        public void onPrepared(MediaPlayer mp) {
-          mPlayer.setDisplay(mHolder);
-          mPlayer.start();
-          //mPlayer.setLooping(true);
-        }
-      });
-    } catch (IOException e) {
-      e.printStackTrace();
-      LogUtil.e(TAG, "notifyVideoInfo() play error", e);
-      ToastUtil.toast("播放失败");
-    }
   }
 
   public void playWebView(String url) {
@@ -136,26 +103,6 @@ public class VideoFragment extends BaseFragment implements View.OnClickListener,
 
   }
 
-
-  private SurfaceHolder.Callback mCallback = new SurfaceHolder.Callback() {
-
-    @Override
-    public void surfaceCreated(SurfaceHolder holder) {
-      mHolder = holder;
-      LogUtil.d(TAG, "surfaceCreated()");
-    }
-
-    @Override
-    public void surfaceChanged(SurfaceHolder holder, int format, int width, int height) {
-      LogUtil.d(TAG, "surfaceChanged()");
-    }
-
-    @Override
-    public void surfaceDestroyed(SurfaceHolder holder) {
-      LogUtil.d(TAG, "surfaceDestroyed()");
-    }
-  };
-
   @Override
   public void startTask() {
     super.startTask();
@@ -174,8 +121,11 @@ public class VideoFragment extends BaseFragment implements View.OnClickListener,
         playWebView(mRawUrl);
         break;
       case R.id.btn_playback_video:
-        ToastUtil.toast("回放");
-        mControlV.setVisibility(View.INVISIBLE);
+        if (TextUtils.isEmpty(mRawUrl)) {
+          ToastUtil.toast("请先选择一个播放地址");
+          return;
+        }
+        startActivityForResult(new Intent(getActivity(), TimePickActivity.class), TimePickActivity.REQUEST_CODE);
         break;
 
       case R.id.iv_up_video:
@@ -246,6 +196,30 @@ public class VideoFragment extends BaseFragment implements View.OnClickListener,
   }
 
   @Override
+  public void playbackResult(VideoPlaybackResult result) {
+    mPlaybackUrl = null;
+    LogUtil.d(TAG, "playbackResult() result=" + result);
+    if (result == null || result.rows == null) {
+      ToastUtil.toast("回放失败，没有获取到回放地址");
+      return;
+    }
+    for (VideoPlaybackResult.Row row : result.rows) {
+      if (row == null || TextUtils.isEmpty(row.result)) {
+        continue;
+      }
+      mPlaybackUrl = row.result;
+      break;
+    }
+    if (TextUtils.isEmpty(mPlaybackUrl)) {
+      ToastUtil.toast("回放失败，没有获取到回放地址");
+      return;
+    }
+    mControlV.setVisibility(View.INVISIBLE);
+    ToastUtil.toast("开始回放");
+    playWebView(mPlaybackUrl);
+  }
+
+  @Override
   public void setPersonal(VideoContract.Presenter p) {
 
   }
@@ -281,11 +255,6 @@ public class VideoFragment extends BaseFragment implements View.OnClickListener,
 
   public void stop() {
     LogUtil.d(TAG, "stop()");
-    if (mPlayer != null) {
-      mPlayer.stop();
-      mPlayer.release();
-      mPlayer = null;
-    }
     if (mVideoWv != null) {
       mVideoWv.stopLoading();
     }
@@ -310,23 +279,17 @@ public class VideoFragment extends BaseFragment implements View.OnClickListener,
       mChannelRequest.specificname = data.getStringExtra(VideoListActivity.EXTRA_KEY_CAMERA_SPECIFIC);
       mPresenter.start();
       playWebView(url);
+    } else if (requestCode == TimePickActivity.REQUEST_CODE && resultCode == TimePickActivity.RESULT_CODE) {
+      long startTime = data.getLongExtra(TimePickActivity.EXTRA_KEY_START_TIME, 0);
+      long endTime = data.getLongExtra(TimePickActivity.EXTRA_KEY_END_TIME, 0);
+      mVideoPlaybackRequest.startTime = startTime - 1000 * 100;
+      mVideoPlaybackRequest.endTime = endTime;
+      mVideoPlaybackRequest.videourl = mRawUrl;
+      LogUtil.d(TAG, "onActivityResult() mVideoPlaybackRequest=" + mVideoPlaybackRequest);
+      mPresenter.playbackRequest();
+      ToastUtil.toast("准备开始回放");
     }
 
   }
 
-  @Override
-  public void onPause() {
-    super.onPause();
-    if (mVideoView != null) {
-      mVideoView.setVisibility(View.INVISIBLE);
-    }
-  }
-
-  @Override
-  public void onResume() {
-    super.onResume();
-    if (mVideoView != null) {
-      mVideoView.setVisibility(View.VISIBLE);
-    }
-  }
 }

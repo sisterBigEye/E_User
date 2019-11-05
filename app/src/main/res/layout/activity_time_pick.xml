@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/ll_ad"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:focusable="true"
+    android:focusableInTouchMode="true"
+    android:gravity="center"
+    android:orientation="vertical">
+
+    <LinearLayout
+        android:layout_width="300dp"
+        android:layout_height="match_parent"
+        android:background="@drawable/shape_dialog"
+        android:gravity="bottom|center"
+        android:orientation="vertical">
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="100dp"
+            android:background="@color/login_btn_color"
+            android:gravity="center"
+            android:text="选择回放区间"
+            android:textColor="@color/white"
+            android:textSize="16sp" />
+
+        <LinearLayout
+            android:gravity="center"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="16dp"
+            android:layout_marginTop="4dp"
+            android:layout_marginEnd="16dp"
+            android:layout_marginBottom="4dp"
+            android:orientation="vertical">
+
+            <TextView
+                android:id="@+id/tv_start_time_pick"
+                android:layout_width="match_parent"
+                android:layout_height="56dp"
+                android:layout_marginTop="8dp"
+                android:background="@drawable/shape_tv"
+                android:gravity="center"
+                android:text="0"
+                android:textColor="@color/black" />
+
+            <TextView
+                android:id="@+id/tv_end_time_pick"
+                android:layout_width="match_parent"
+                android:layout_height="56dp"
+                android:layout_marginTop="16dp"
+                android:layout_marginBottom="8dp"
+                android:background="@drawable/shape_tv"
+                android:gravity="center"
+                android:text="1"
+                android:textColor="@color/black" />
+
+            <Button
+                android:id="@+id/btn_sure_time_pick"
+                android:layout_width="wrap_content"
+                android:layout_height="48dp"
+                android:layout_marginTop="16dp"
+                android:layout_marginBottom="8dp"
+                android:background="@drawable/shape_login_btn"
+                android:gravity="center"
+                android:text="确定"
+                android:textColor="@color/white" />
+        </LinearLayout>
+
+    </LinearLayout>
+
+    <View
+        android:layout_width="2dp"
+        android:layout_height="36dp"
+        android:background="@color/white" />
+
+
+    <ImageView
+        android:id="@+id/iv_cencel_time_pick"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:src="@drawable/ic_cancel" />
+
+
+</LinearLayout>

@@ -160,6 +160,7 @@ public class HttpApi {
     switch (iRequest.getContentType()) {
       case IRequest.DEFAULT:
         FormBody.Builder builder = new FormBody.Builder();
+        LogUtil.d(TAG, "requestByPost() DEFAULT url=" + url);
         for (Map.Entry<String, String> entry : iRequest.getParamMap().entrySet()) {
           String key = entry.getKey();
           String value = entry.getValue();
@@ -199,6 +200,7 @@ public class HttpApi {
         LogUtil.d(TAG, "requestByPost() --- response is not Successful");
         return null;
       }
+      LogUtil.d(TAG, "requestByPost() --- Successful");
       ResponseBody responseBody = response.body();
       if (responseBody == null) {
         LogUtil.d(TAG, "requestByPost() --- responseBody is null");

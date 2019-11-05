@@ -9,14 +9,20 @@ public class VideoPresenter implements VideoContract.Presenter {
   private VideoContract.View view;
   private VideoControlRequest mControlRequest;
   private VideoChannelRequest mChannelRequest;
+  private VideoPlaybackRequest mVideoPlaybackRequest;
+
   private ITask<VideoControlResult> videoControlTask;
   private ITask<VideoChannel> videoChannelTask;
+  private ITask<VideoPlaybackResult> videoPlaybackTask;
 
-  VideoPresenter(VideoContract.View view, VideoControlRequest controlRequest,
-                 VideoChannelRequest channelRequest) {
+  VideoPresenter(VideoContract.View view,
+                 VideoControlRequest controlRequest,
+                 VideoChannelRequest channelRequest,
+                 VideoPlaybackRequest videoPlaybackRequest) {
     this.view = view;
     this.mControlRequest = controlRequest;
     this.mChannelRequest = channelRequest;
+    this.mVideoPlaybackRequest = videoPlaybackRequest;
     this.view.setPersonal(this);
   }
 
@@ -48,6 +54,20 @@ public class VideoPresenter implements VideoContract.Presenter {
       @Override
       public void result(VideoControlResult result) {
         view.controlVideoResult(result);
+      }
+
+    });
+  }
+
+  @Override
+  public void playbackRequest() {
+    if (videoPlaybackTask == null) {
+      videoPlaybackTask = new RequestDataTask<>(VideoPlaybackResult.class);
+    }
+    videoPlaybackTask.startTask(mVideoPlaybackRequest, new Callback<VideoPlaybackResult>() {
+      @Override
+      public void result(VideoPlaybackResult result) {
+        view.playbackResult(result);
       }
 
     });
