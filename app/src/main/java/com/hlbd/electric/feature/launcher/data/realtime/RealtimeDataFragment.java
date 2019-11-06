@@ -62,6 +62,8 @@ public class RealtimeDataFragment extends BaseFragment implements RealtimeDataCo
 
   private View mOtherV;
 
+  private View mFragmentView;
+
   @Nullable
   @Override
   public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
@@ -123,6 +125,7 @@ public class RealtimeDataFragment extends BaseFragment implements RealtimeDataCo
   }
 
   private void initView() {
+    mFragmentView = mBaseView.findViewById(R.id.ll_fgt_detail_data);
     mTitleTv.setText("实时数据");
     mIv = mBaseView.findViewById(R.id.iv_data_detail_data);
 
@@ -306,17 +309,22 @@ public class RealtimeDataFragment extends BaseFragment implements RealtimeDataCo
   }
 
   private void notifyDataAndState(int index, BaseFragment fragment) {
-    if (index == INDEX_VIDEO) {
-      mOtherV.setVisibility(View.GONE);
-    } else {
-      mOtherV.setVisibility(View.VISIBLE);
-    }
     mCurrentFragment.stopTask();
     fragment.startTask();
     FragmentTransaction transaction = mManager.beginTransaction();
     transaction.hide(mCurrentFragment).show(fragment)
             .commit();
     mCurrentFragment = fragment;
+
+    if (index == INDEX_VIDEO) {
+      if (mFragmentView != null) {
+        mFragmentView.setVisibility(View.INVISIBLE);
+      }
+      mOtherV.setVisibility(View.GONE);
+    } else {
+      mOtherV.setVisibility(View.VISIBLE);
+    }
+    mFragmentView.setVisibility(View.VISIBLE);
 
     for (int i = 0; i < mTabLlList.size(); i++) {
       TabInfo info = mTabLlList.get(i);

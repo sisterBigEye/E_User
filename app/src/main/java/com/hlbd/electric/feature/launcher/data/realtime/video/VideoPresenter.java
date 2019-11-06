@@ -2,6 +2,8 @@ package com.hlbd.electric.feature.launcher.data.realtime.video;
 
 import com.hlbd.electric.api.Callback;
 import com.hlbd.electric.api.ITask;
+import com.hlbd.electric.feature.launcher.data.realtime.video.list.VideoListInfo;
+import com.hlbd.electric.feature.launcher.data.realtime.video.list.VideoListRequest;
 import com.hlbd.electric.task.RequestDataTask;
 
 public class VideoPresenter implements VideoContract.Presenter {
@@ -10,19 +12,24 @@ public class VideoPresenter implements VideoContract.Presenter {
   private VideoControlRequest mControlRequest;
   private VideoChannelRequest mChannelRequest;
   private VideoPlaybackRequest mVideoPlaybackRequest;
+  private VideoListRequest mVideoListRequest;
 
   private ITask<VideoControlResult> videoControlTask;
   private ITask<VideoChannel> videoChannelTask;
   private ITask<VideoPlaybackResult> videoPlaybackTask;
 
+  private ITask<VideoListInfo> videoListTask;
+
   VideoPresenter(VideoContract.View view,
                  VideoControlRequest controlRequest,
                  VideoChannelRequest channelRequest,
-                 VideoPlaybackRequest videoPlaybackRequest) {
+                 VideoPlaybackRequest videoPlaybackRequest,
+                 VideoListRequest request) {
     this.view = view;
     this.mControlRequest = controlRequest;
     this.mChannelRequest = channelRequest;
     this.mVideoPlaybackRequest = videoPlaybackRequest;
+    this.mVideoListRequest = request;
     this.view.setPersonal(this);
   }
 
@@ -68,6 +75,20 @@ public class VideoPresenter implements VideoContract.Presenter {
       @Override
       public void result(VideoPlaybackResult result) {
         view.playbackResult(result);
+      }
+
+    });
+  }
+
+  @Override
+  public void loadVideoInfo() {
+    if (videoListTask == null) {
+      videoListTask = new RequestDataTask<>(VideoListInfo.class);
+    }
+    videoListTask.startTask(mVideoListRequest, new Callback<VideoListInfo>() {
+      @Override
+      public void result(VideoListInfo info) {
+        view.notifyVideoInfo(info);
       }
 
     });

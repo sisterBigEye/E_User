@@ -1,6 +1,5 @@
 package com.hlbd.electric.feature.launcher.report;
 
-import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -13,14 +12,21 @@ import android.widget.AdapterView;
 import android.widget.ListView;
 import android.widget.TextView;
 
+import com.airsaid.pickerviewlibrary.OptionsPickerView;
 import com.hlbd.electric.R;
 import com.hlbd.electric.api.HttpApi;
 import com.hlbd.electric.base.BaseFragment;
+import com.hlbd.electric.feature.launcher.data.realtime.common.CommonRequest;
 import com.hlbd.electric.feature.launcher.data.realtime.elec.list.ElecListActivity;
 import com.hlbd.electric.feature.launcher.report.data.ReportDetailData;
 import com.hlbd.electric.feature.launcher.report.data.ReportTypeData;
+import com.hlbd.electric.model.Information;
 import com.hlbd.electric.util.LogUtil;
 import com.hlbd.electric.util.TimeUtil;
+import com.hlbd.electric.util.ToastUtil;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class ReportFragment extends BaseFragment implements ReportContract.View<ReportTypeData>, View.OnClickListener {
 
@@ -34,6 +40,7 @@ public class ReportFragment extends BaseFragment implements ReportContract.View<
   private String chooseTimeStr;
   private View mTypeDayV;
   private View mTypeMonV;
+  private TextView mItemTv;
   private ReportDetailRequest detailRequest;
   private static final String TYPE_DAY = "日报";
   private static final String TYPE_MON = "月报";
@@ -41,6 +48,10 @@ public class ReportFragment extends BaseFragment implements ReportContract.View<
 
   private Intent mIntent;
   private String mDev = "";
+
+  private boolean needShowPickerLater;
+
+  private List<Information.Row> mCurrentRows;
 
   @Nullable
   @Override
@@ -70,7 +81,12 @@ public class ReportFragment extends BaseFragment implements ReportContract.View<
       detailRequest.url = "Baoding_Overview_DataSupport/Services/GetUserReportByDateAndTypeAndUser?"
               + "date=" + chooseTime + "&type=" + TYPE_DAY + "&user=" + HttpApi.getUserName();
     }
-    presenter = new ReportPresenter(this, request, detailRequest);
+
+    CommonRequest electricRequest = new CommonRequest();
+    electricRequest.userTag = HttpApi.getUserName();
+    electricRequest.url = "Baoding_Overview_DataSupport/Services/GetUsersElecDevice?";
+    presenter = new ReportPresenter(this, request, detailRequest, electricRequest);
+    presenter.loadElectricData();
   }
 
   private void initView() {
@@ -92,19 +108,24 @@ public class ReportFragment extends BaseFragment implements ReportContract.View<
 
       }
     });
+
+    mItemTv = mBaseView.findViewById(R.id.tv_item_report);
+    mItemTv.setOnClickListener(this);
   }
 
   @Override
   public void updateReportType(ReportTypeData typeData) {
-
+    LogUtil.d(TAG, "updateReportType() ReportTypeData=" + typeData);
   }
 
   @Override
   public void updateDetailInfo(ReportDetailData data) {
+    LogUtil.d(TAG, "updateDetailInfo() ReportDetailData=" + data);
     if (data == null || data.rows == null || data.rows.size() == 0) {
       mAdapter.clear();
       return;
     }
+    LogUtil.d(TAG, "updateDetailInfo() size=" + data.rows.size());
     mAdapter.addDataList(data.rows);
   }
 
@@ -117,14 +138,14 @@ public class ReportFragment extends BaseFragment implements ReportContract.View<
   @Override
   public void startTask() {
     //presenter.start();
-    Activity activity = getActivity();
+    /*Activity activity = getActivity();
     if (mIntent == null && activity != null) {
       mIntent = new Intent(activity, ElecListActivity.class);
       mIntent.putExtra(ElecListActivity.KEY_EXTRA_IN_TITLE, "选择报告项");
     }
     if (mIntent != null) {
       startActivityForResult(mIntent, ElecListActivity.REQUEST_REPOTT_CODE);
-    }
+    }*/
   }
 
   @Override
@@ -141,6 +162,15 @@ public class ReportFragment extends BaseFragment implements ReportContract.View<
         break;
       case R.id.ll_type_mon_report:
         switchType(TYPE_MON);
+        break;
+
+      case R.id.tv_item_report:
+        if (mCurrentRows == null || mCurrentRows.size() == 0) {
+          needShowPickerLater = true;
+          presenter.loadElectricData();
+          return;
+        }
+        showPicker();
         break;
       default:
         break;
@@ -203,5 +233,64 @@ public class ReportFragment extends BaseFragment implements ReportContract.View<
       loadDetailInfo();
     }
 
+  }
+
+  @Override
+  public void updateElectricData(Information information) {
+    LogUtil.d(TAG, "updateElectricData() information=" + information);
+    if (information == null || information.rows == null || information.rows.size() == 0) {
+      ToastUtil.toast("获取数据失败，请稍后尝试");
+      needShowPickerLater = false;
+      return;
+    }
+    mCurrentRows = information.rows;
+    if (needShowPickerLater) {
+      needShowPickerLater = false;
+      showPicker();
+      return;
+    }
+    mDev = information.rows.get(0).description;
+    mItemTv.setText(mDev);
+    loadDetailInfo();
+
+  }
+
+  private void showPicker() {
+    /*Activity activity = getActivity();
+    LogUtil.d(TAG, "showPicker() activity=" + activity);
+    if (activity == null) {
+      return;
+    }
+    if (mIntent == null) {
+      mIntent = new Intent(activity, ElecListActivity.class);
+      mIntent.putExtra(ElecListActivity.KEY_EXTRA_IN_TITLE, "选择电力监测设备");
+    }
+    startActivityForResult(mIntent, ElecListActivity.REQUEST_ELEC_CODE);*/
+
+    if (mCurrentRows == null || mCurrentRows.size() == 0) {
+      return;
+    }
+    OptionsPickerView<String> mOptionsPickerView = new OptionsPickerView<>(getActivity());
+    final ArrayList<String> list = new ArrayList<>();
+    // 设置数据
+    for (Information.Row row : mCurrentRows) {
+      if (row != null) {
+        list.add(row.description);
+      }
+    }
+    mOptionsPickerView.setPicker(list);
+    // 设置选项单位
+    //mOptionsPickerView.setLabels("性");
+    mOptionsPickerView.setOnOptionsSelectListener(new OptionsPickerView.OnOptionsSelectListener() {
+      @Override
+      public void onOptionsSelect(int option1, int option2, int option3) {
+        String value = list.get(option1);
+        ToastUtil.toast("选中了 " + value);
+        mItemTv.setText(value);
+        mDev = value;
+        loadDetailInfo();
+      }
+    });
+    mOptionsPickerView.show();
   }
 }

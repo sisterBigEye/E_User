@@ -14,15 +14,19 @@ class VideoContract {
 
         void playbackRequest();
 
+        void loadVideoInfo();
+
     }
 
-    interface View extends BaseView<Presenter> {
+    interface View<T> extends BaseView<Presenter> {
 
         void channelResult(VideoChannel channel);
 
         void controlVideoResult(VideoControlResult result);
 
         void playbackResult(VideoPlaybackResult result);
+
+        void notifyVideoInfo(T t);
 
 
     }

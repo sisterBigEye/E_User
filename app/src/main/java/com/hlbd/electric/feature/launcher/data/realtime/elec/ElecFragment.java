@@ -1,6 +1,5 @@
 package com.hlbd.electric.feature.launcher.data.realtime.elec;
 
-import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
@@ -13,6 +12,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
+import com.airsaid.pickerviewlibrary.OptionsPickerView;
 import com.hlbd.electric.R;
 import com.hlbd.electric.api.HttpApi;
 import com.hlbd.electric.base.BaseFragment;
@@ -29,16 +29,19 @@ import com.hlbd.electric.feature.launcher.data.realtime.elec.data.ElectDataVC;
 import com.hlbd.electric.feature.launcher.data.realtime.elec.list.ElecListActivity;
 import com.hlbd.electric.model.Information;
 import com.hlbd.electric.util.LogUtil;
+import com.hlbd.electric.util.ToastUtil;
 
 import java.lang.ref.WeakReference;
+import java.util.ArrayList;
+import java.util.List;
 
-public class ElecFragment extends BaseFragment implements ElecContract.View<Information> {
+public class ElecFragment extends BaseFragment implements ElecContract.View<Information>, View.OnClickListener {
 
   private static final String TAG = "ElecFragment";
   private View mParentView;
   private ElecContract.Presenter mPresenter;
   private EventHandler mHandler;
-  private boolean needRequest;
+  private boolean needShowPicker;
 
   private TextView mIADescTv;
   private TextView mIAValueTv;
@@ -67,9 +70,10 @@ public class ElecFragment extends BaseFragment implements ElecContract.View<Info
   private TextView mQDescTv;
   private TextView mQValueTv;
 
-  private boolean needStart = false;
-  private boolean isActivityCreate = false;
+  private TextView mEleItemTv;
+
   private Intent mIntent;
+  public List<Information.Row> mCurrentRows;
 
   @Nullable
   @Override
@@ -90,10 +94,9 @@ public class ElecFragment extends BaseFragment implements ElecContract.View<Info
     electricRequest.url = "Baoding_Overview_DataSupport/Services/GetUsersElecDevice?";
 
     mPresenter = new ElecPresenter(this, electricRequest);
-    if (needRequest) {
-      mPresenter.start();
-      needRequest = false;
-    }
+
+    mPresenter.start();
+
   }
 
   private void initView() {
@@ -123,6 +126,9 @@ public class ElecFragment extends BaseFragment implements ElecContract.View<Info
 
     mQDescTv = mParentView.findViewById(R.id.tv_q_desc_info_ele);
     mQValueTv = mParentView.findViewById(R.id.tv_q_value_info_ele);
+
+    mEleItemTv = mParentView.findViewById(R.id.tv_ele_item_info_ele);
+    mEleItemTv.setOnClickListener(this);
   }
 
   @Override
@@ -130,8 +136,18 @@ public class ElecFragment extends BaseFragment implements ElecContract.View<Info
     LogUtil.d(TAG, "updateElectricData() --- ElectricInfo=" + information);
     String name = null;
     if (information != null) {
+      mCurrentRows = information.rows;
+      if (needShowPicker) {
+        showPicker();
+        needShowPicker = false;
+        return;
+      }
       name = getName(information.rows);
+      mEleItemTv.setText(name);
       requestElectricDetail(name);
+    } else {
+      needShowPicker = false;
+      ToastUtil.toast("请求列表失败，请稍后尝试");
     }
   }
 
@@ -221,6 +237,20 @@ public class ElecFragment extends BaseFragment implements ElecContract.View<Info
     mPresenter = p;
   }
 
+  @Override
+  public void onClick(View v) {
+    switch (v.getId()) {
+      case R.id.tv_ele_item_info_ele:
+        if (mCurrentRows == null) {
+          needShowPicker = true;
+          mPresenter.start();
+          return;
+        }
+        showPicker();
+        break;
+    }
+  }
+
   private static class EventHandler extends Handler {
 
     private final WeakReference<ElecFragment> mRef;
@@ -246,11 +276,7 @@ public class ElecFragment extends BaseFragment implements ElecContract.View<Info
   }
 
   public void startTask() {
-    needStart = true;
-    LogUtil.d(TAG, "startTask()");
-    if (isActivityCreate) {
-      showDialog();
-    }
+    LogUtil.d(TAG, "startTask() isFirst");
   }
 
   private void requestElectricData() {
@@ -264,26 +290,15 @@ public class ElecFragment extends BaseFragment implements ElecContract.View<Info
     mPresenter.loadElectricDetail(url);
   }
 
-  @Override
-  public void onActivityCreated(@Nullable Bundle savedInstanceState) {
-    super.onActivityCreated(savedInstanceState);
-    isActivityCreate = true;
-    LogUtil.d(TAG, "onActivityCreated()");
-    if (needStart) {
-      showDialog();
-    }
-  }
-
 
   @Override
   public void stopTask() {
     super.stopTask();
-    needStart = false;
   }
 
-  private void showDialog() {
-    Activity activity = getActivity();
-    LogUtil.d(TAG, "showDialog() activity=" + activity);
+  private void showPicker() {
+    /*Activity activity = getActivity();
+    LogUtil.d(TAG, "showPicker() activity=" + activity);
     if (activity == null) {
       return;
     }
@@ -291,7 +306,32 @@ public class ElecFragment extends BaseFragment implements ElecContract.View<Info
       mIntent = new Intent(activity, ElecListActivity.class);
       mIntent.putExtra(ElecListActivity.KEY_EXTRA_IN_TITLE, "选择电力监测设备");
     }
-    startActivityForResult(mIntent, ElecListActivity.REQUEST_ELEC_CODE);
+    startActivityForResult(mIntent, ElecListActivity.REQUEST_ELEC_CODE);*/
+
+    if (mCurrentRows == null || mCurrentRows.size() == 0) {
+      return;
+    }
+    OptionsPickerView<String> mOptionsPickerView = new OptionsPickerView<>(getActivity());
+    final ArrayList<String> list = new ArrayList<>();
+    // 设置数据
+    for (Information.Row row : mCurrentRows) {
+      if (row != null) {
+        list.add(row.name);
+      }
+    }
+    mOptionsPickerView.setPicker(list);
+    // 设置选项单位
+    //mOptionsPickerView.setLabels("性");
+    mOptionsPickerView.setOnOptionsSelectListener(new OptionsPickerView.OnOptionsSelectListener() {
+      @Override
+      public void onOptionsSelect(int option1, int option2, int option3) {
+        String value = list.get(option1);
+        ToastUtil.toast("选中了 " + value);
+        mEleItemTv.setText(value);
+        requestElectricDetail(value);
+      }
+    });
+    mOptionsPickerView.show();
   }
 
   @Override
@@ -302,6 +342,7 @@ public class ElecFragment extends BaseFragment implements ElecContract.View<Info
       if (value == null || TextUtils.isEmpty(value)) {
         return;
       }
+      mEleItemTv.setText(value);
       requestElectricDetail(value);
     }
 

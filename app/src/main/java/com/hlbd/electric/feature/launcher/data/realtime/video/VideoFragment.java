@@ -10,23 +10,32 @@ import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.webkit.WebSettings;
 import android.webkit.WebView;
+import android.widget.TextView;
 
+import com.airsaid.pickerviewlibrary.OptionsPickerView;
 import com.hlbd.electric.R;
+import com.hlbd.electric.api.HttpApi;
 import com.hlbd.electric.base.BaseFragment;
 import com.hlbd.electric.feature.launcher.data.realtime.video.list.VideoListActivity;
+import com.hlbd.electric.feature.launcher.data.realtime.video.list.VideoListInfo;
+import com.hlbd.electric.feature.launcher.data.realtime.video.list.VideoListRequest;
 import com.hlbd.electric.util.LogUtil;
 import com.hlbd.electric.util.ToastUtil;
 
 import java.lang.ref.WeakReference;
+import java.util.ArrayList;
+import java.util.List;
 
-public class VideoFragment extends BaseFragment implements View.OnClickListener, VideoContract.View {
+public class VideoFragment extends BaseFragment implements View.OnClickListener, VideoContract.View<VideoListInfo> {
 
   private static final String TAG = "VideoFragment";
 
   private View mParentView;
   private WebView mVideoWv;
   private View mControlV;
+  private TextView mNameTv;
   private String mRawUrl;
   private String mPlaybackUrl;
   private String mCurrentCameraType;
@@ -36,6 +45,10 @@ public class VideoFragment extends BaseFragment implements View.OnClickListener,
   private VideoControlRequest mControlRequest;
   private VideoChannelRequest mChannelRequest;
   private VideoPlaybackRequest mVideoPlaybackRequest;
+  private VideoListRequest mVideoListRequest;
+  private List<VideoListInfo.Row> mCurrentRows;
+
+  private boolean needShowPickerLater;
 
   @Nullable
   @Override
@@ -58,11 +71,16 @@ public class VideoFragment extends BaseFragment implements View.OnClickListener,
 
     mVideoPlaybackRequest = new VideoPlaybackRequest();
     mVideoPlaybackRequest.url = "Baoding_VideoThing/Services/VideoPlayBack?";
-    mPresenter = new VideoPresenter(this, mControlRequest, mChannelRequest, mVideoPlaybackRequest);
+
+    mVideoListRequest = new VideoListRequest(HttpApi.getUserName());
+    mVideoListRequest.url = "Baoding_VideoThing/Services/SelectVideoByKeyword?";
+    mVideoListRequest.keyword = "";
+    mPresenter = new VideoPresenter(this, mControlRequest, mChannelRequest, mVideoPlaybackRequest, mVideoListRequest);
+
+    mPresenter.loadVideoInfo();
   }
 
   private void initView() {
-    //mVideoView = mParentView.findViewById(R.id.sv_video);
     mControlV = mParentView.findViewById(R.id.ll_control_video);
     mVideoWv = mParentView.findViewById(R.id.wv_video);
 
@@ -77,6 +95,8 @@ public class VideoFragment extends BaseFragment implements View.OnClickListener,
     mParentView.findViewById(R.id.btn_enlarge_video).setOnClickListener(this);
     mParentView.findViewById(R.id.btn_narrow_video).setOnClickListener(this);
 
+    mNameTv = mParentView.findViewById(R.id.tv_name_video);
+    mNameTv.setOnClickListener(this);
   }
 
   public void playWebView(String url) {
@@ -87,7 +107,13 @@ public class VideoFragment extends BaseFragment implements View.OnClickListener,
 
     mVideoWv.reload();
 
-    mVideoWv.getSettings().setJavaScriptEnabled(true);
+    WebSettings settings = mVideoWv.getSettings();
+
+    settings.setJavaScriptEnabled(true);
+
+    settings.setUseWideViewPort(true);
+
+    settings.setLoadWithOverviewMode(true);
 
     //mVideoWv.getSettings().setPluginsEnabled(true);
 
@@ -95,7 +121,7 @@ public class VideoFragment extends BaseFragment implements View.OnClickListener,
 
     mVideoWv.setVisibility(View.VISIBLE);
 
-    mVideoWv.getSettings().setUseWideViewPort(true);
+    settings.setUseWideViewPort(true);
 
     mVideoWv.loadUrl(url);
 
@@ -106,13 +132,23 @@ public class VideoFragment extends BaseFragment implements View.OnClickListener,
   @Override
   public void startTask() {
     super.startTask();
-    startActivityForResult(new Intent(getActivity(), VideoListActivity.class), VideoListActivity.REQUEST_CODE);
+    //startActivityForResult(new Intent(getActivity(), VideoListActivity.class), VideoListActivity.REQUEST_CODE);
   }
 
   @Override
   public void onClick(View v) {
     boolean isControl = false;
     switch (v.getId()) {
+
+      case R.id.tv_name_video:
+        if (mCurrentRows == null || mCurrentRows.size() == 0) {
+          needShowPickerLater = true;
+          mPresenter.loadVideoInfo();
+          return;
+        }
+        showPicker();
+        break;
+
       case R.id.btn_live_video:
         ToastUtil.toast("直播");
         if (mCurrentCameraType != null && mCurrentCameraType.equals("球机")) {
@@ -220,6 +256,23 @@ public class VideoFragment extends BaseFragment implements View.OnClickListener,
   }
 
   @Override
+  public void notifyVideoInfo(VideoListInfo videoListInfo) {
+    LogUtil.d(TAG, "notifyVideoInfo() info=" + videoListInfo);
+    if (videoListInfo == null || videoListInfo.rows == null || videoListInfo.rows.size() == 0) {
+      ToastUtil.toast("获取数据失败");
+      needShowPickerLater = false;
+      return;
+    }
+    mCurrentRows = videoListInfo.rows;
+    if (needShowPickerLater) {
+      needShowPickerLater = false;
+      showPicker();
+      return;
+    }
+    handleVideoInfo(videoListInfo.rows.get(0), false);
+  }
+
+  @Override
   public void setPersonal(VideoContract.Presenter p) {
 
   }
@@ -264,21 +317,7 @@ public class VideoFragment extends BaseFragment implements View.OnClickListener,
   public void onActivityResult(int requestCode, int resultCode, Intent data) {
     super.onActivityResult(requestCode, resultCode, data);
     if (requestCode == VideoListActivity.REQUEST_CODE && resultCode == VideoListActivity.RESULT_CODE) {
-      String url = data.getStringExtra(VideoListActivity.EXTRA_KEY_URL);
-      mRawUrl = url;
-      String cameraType = data.getStringExtra(VideoListActivity.EXTRA_KEY_CAMERA_TYPE);
-      mCurrentCameraType = cameraType;
-      if (cameraType == null || !cameraType.equals("球机")) {
-        mControlV.setVisibility(View.INVISIBLE);
-      } else {
-        mControlV.setVisibility(View.VISIBLE);
-      }
-      if (url == null || TextUtils.isEmpty(url)) {
-        return;
-      }
-      mChannelRequest.specificname = data.getStringExtra(VideoListActivity.EXTRA_KEY_CAMERA_SPECIFIC);
-      mPresenter.start();
-      playWebView(url);
+      // Do nothing
     } else if (requestCode == TimePickActivity.REQUEST_CODE && resultCode == TimePickActivity.RESULT_CODE) {
       long startTime = data.getLongExtra(TimePickActivity.EXTRA_KEY_START_TIME, 0);
       long endTime = data.getLongExtra(TimePickActivity.EXTRA_KEY_END_TIME, 0);
@@ -290,6 +329,68 @@ public class VideoFragment extends BaseFragment implements View.OnClickListener,
       ToastUtil.toast("准备开始回放");
     }
 
+  }
+
+  private void showPicker() {
+    /*Activity activity = getActivity();
+    LogUtil.d(TAG, "showPicker() activity=" + activity);
+    if (activity == null) {
+      return;
+    }
+    if (mIntent == null) {
+      mIntent = new Intent(activity, ElecListActivity.class);
+      mIntent.putExtra(ElecListActivity.KEY_EXTRA_IN_TITLE, "选择电力监测设备");
+    }
+    startActivityForResult(mIntent, ElecListActivity.REQUEST_ELEC_CODE);*/
+
+    if (mCurrentRows == null || mCurrentRows.size() == 0) {
+      return;
+    }
+    OptionsPickerView<String> mOptionsPickerView = new OptionsPickerView<>(getActivity());
+    final ArrayList<String> list = new ArrayList<>();
+    // 设置数据
+    for (VideoListInfo.Row row : mCurrentRows) {
+      if (row != null) {
+        list.add(row.specificname);
+      }
+    }
+    mOptionsPickerView.setPicker(list);
+    // 设置选项单位
+    //mOptionsPickerView.setLabels("性");
+    mOptionsPickerView.setOnOptionsSelectListener(new OptionsPickerView.OnOptionsSelectListener() {
+      @Override
+      public void onOptionsSelect(int option1, int option2, int option3) {
+        String value = list.get(option1);
+        ToastUtil.toast("选中了 " + value);
+        for (VideoListInfo.Row row : mCurrentRows) {
+          if (value.equals(row.specificname)) {
+            handleVideoInfo(row, true);
+            break;
+          }
+        }
+      }
+    });
+    mOptionsPickerView.show();
+  }
+
+  private void handleVideoInfo(VideoListInfo.Row row, boolean needLoad) {
+    mRawUrl = row.videourl;
+    mNameTv.setText(row.specificname);
+    String cameraType = row.cameratype;
+    mCurrentCameraType = cameraType;
+    if (cameraType == null || !cameraType.equals("球机")) {
+      mControlV.setVisibility(View.INVISIBLE);
+    } else {
+      mControlV.setVisibility(View.VISIBLE);
+    }
+    if (mRawUrl == null || TextUtils.isEmpty(mRawUrl)) {
+      return;
+    }
+    mChannelRequest.specificname = row.specificname;
+    mPresenter.start();
+    if (needLoad) {
+      playWebView(mRawUrl);
+    }
   }
 
 }
