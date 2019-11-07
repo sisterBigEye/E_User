@@ -111,7 +111,7 @@ public class VideoFragment extends BaseFragment implements View.OnClickListener,
 
     settings.setJavaScriptEnabled(true);
 
-    settings.setUseWideViewPort(true);
+    //settings.setUseWideViewPort(true);
 
     settings.setLoadWithOverviewMode(true);
 

@@ -36,13 +36,11 @@ public class FloodingData implements IData {
     }
     for (Row row : rows) {
       switch ((int) row.value) {
-        case 1:
+        case 0:
           return "正常";
-        case 2:
-          return "浸水进行调整";
       }
     }
-    return "";
+    return "浸水";
   }
 
   @Override

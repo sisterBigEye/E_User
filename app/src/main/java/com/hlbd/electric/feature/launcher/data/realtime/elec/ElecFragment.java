@@ -6,7 +6,6 @@ import android.os.Handler;
 import android.os.Message;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
-import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -26,7 +25,6 @@ import com.hlbd.electric.feature.launcher.data.realtime.elec.data.ElectDataQ;
 import com.hlbd.electric.feature.launcher.data.realtime.elec.data.ElectDataVA;
 import com.hlbd.electric.feature.launcher.data.realtime.elec.data.ElectDataVB;
 import com.hlbd.electric.feature.launcher.data.realtime.elec.data.ElectDataVC;
-import com.hlbd.electric.feature.launcher.data.realtime.elec.list.ElecListActivity;
 import com.hlbd.electric.model.Information;
 import com.hlbd.electric.util.LogUtil;
 import com.hlbd.electric.util.ToastUtil;
@@ -134,21 +132,20 @@ public class ElecFragment extends BaseFragment implements ElecContract.View<Info
   @Override
   public void updateElectricData(Information information) {
     LogUtil.d(TAG, "updateElectricData() --- ElectricInfo=" + information);
-    String name = null;
-    if (information != null) {
-      mCurrentRows = information.rows;
-      if (needShowPicker) {
-        showPicker();
-        needShowPicker = false;
-        return;
-      }
-      name = getName(information.rows);
-      mEleItemTv.setText(name);
-      requestElectricDetail(name);
-    } else {
+    if (information == null || information.rows == null || information.rows.size() == 0) {
       needShowPicker = false;
       ToastUtil.toast("请求列表失败，请稍后尝试");
     }
+    mCurrentRows = information.rows;
+    if (needShowPicker) {
+      showPicker();
+      needShowPicker = false;
+      return;
+    }
+    Information.Row row = information.rows.get(0);
+    mEleItemTv.setText(row.description);
+    requestElectricDetail(row.name);
+
   }
 
   @Override
@@ -316,7 +313,7 @@ public class ElecFragment extends BaseFragment implements ElecContract.View<Info
     // 设置数据
     for (Information.Row row : mCurrentRows) {
       if (row != null) {
-        list.add(row.name);
+        list.add(row.description);
       }
     }
     mOptionsPickerView.setPicker(list);
@@ -327,8 +324,13 @@ public class ElecFragment extends BaseFragment implements ElecContract.View<Info
       public void onOptionsSelect(int option1, int option2, int option3) {
         String value = list.get(option1);
         ToastUtil.toast("选中了 " + value);
-        mEleItemTv.setText(value);
-        requestElectricDetail(value);
+        for (Information.Row row : mCurrentRows) {
+          if (row.description.equals(value)) {
+            requestElectricDetail(row.name);
+            mEleItemTv.setText(row.description);
+            break;
+          }
+        }
       }
     });
     mOptionsPickerView.show();
@@ -337,14 +339,14 @@ public class ElecFragment extends BaseFragment implements ElecContract.View<Info
   @Override
   public void onActivityResult(int requestCode, int resultCode, Intent data) {
     super.onActivityResult(requestCode, resultCode, data);
-    if (requestCode == ElecListActivity.REQUEST_ELEC_CODE && resultCode == ElecListActivity.RESULT_CODE) {
+    /*if (requestCode == ElecListActivity.REQUEST_ELEC_CODE && resultCode == ElecListActivity.RESULT_CODE) {
       String value = data.getStringExtra(ElecListActivity.KEY_EXTRA_OUT1);
       if (value == null || TextUtils.isEmpty(value)) {
         return;
       }
       mEleItemTv.setText(value);
       requestElectricDetail(value);
-    }
+    }*/
 
   }
 }
